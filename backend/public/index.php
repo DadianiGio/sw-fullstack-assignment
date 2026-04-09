@@ -7,12 +7,10 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 use App\Controller\GraphQL;
 use Dotenv\Dotenv;
 
-// Load environment variables from .env
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
-//CORS headers
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -23,5 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-//Route all requests to GraphQL handler 
+// Handle plain GET visits (browser test)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    echo json_encode(['status' => 'GraphQL API is running. Send POST requests.']);
+    exit();
+}
+
 echo GraphQL::handle();
