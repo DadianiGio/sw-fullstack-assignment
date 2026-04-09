@@ -233,26 +233,26 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   letter-spacing: 1px;
 }
 
-/* Quick shop button hidden by default, shown on hover */
+/* Quick shop button — hidden by default, shown on hover */
 .product-card__quick-shop {
   position: absolute;
   bottom: -20px;
-  right: 16px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #5ece7b;
+  right: 0px;
+  width: 74px;
+  height: 74px;
+  background: none;
+  border: none;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity .2s, transform .2s;
+  transition: opacity .2s;
   z-index: 10;
-  transform: translateY(0);
+  cursor: pointer;
 }
 .product-card:hover .product-card__quick-shop {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .product-card__info { padding: 24px 0 8px; }

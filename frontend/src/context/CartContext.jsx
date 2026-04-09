@@ -19,7 +19,7 @@ export function CartProvider({ children }) {
     setCartItems(prev => {
       const existing = prev.find(i => i.key === key);
       if (existing) {
-        // Same product + same options -> increase quantity
+        // Same product + same options → increase quantity
         return prev.map(i => i.key === key ? { ...i, quantity: i.quantity + 1 } : i);
       }
       // New line item
