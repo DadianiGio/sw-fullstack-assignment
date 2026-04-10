@@ -1,19 +1,26 @@
 FROM php:8.1-apache
 
+# Install system dependencies & zip tools
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo_mysql zip mbstring bcmath
+
 # Enable Apache modules
 RUN a2enmod rewrite headers
 
-# Install PDO MySQL extension
-RUN docker-php-ext-install pdo_mysql
-
-# Install Composer directly
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install Composer using the official image
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first (for better Docker layer caching)
-COPY composer.json composer.lock ./
+# Copy composer files first
+COPY composer.json composer.lock* ./
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-autoloader
@@ -21,7 +28,7 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-autoloader
 # Copy rest of backend files
 COPY . .
 
-# Generate autoloader with full source
+# Generate autoloader
 RUN composer dump-autoload --optimize
 
 # Apache config — point to public folder
