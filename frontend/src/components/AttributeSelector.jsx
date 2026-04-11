@@ -18,8 +18,8 @@ export default function AttributeSelector({ attribute, selected, onChange }) {
         {attribute.items.map(item => {
           const isSelected = selected === item.id;
 
-          // Test looks for both value (#44FF03) and id (Green) so we use item.id
-          const itemKebab = toKebabCase(item.id);
+           // Use raw values to match test locators; kebab-case breaks exact matches like 'Green' or hex codes.
+          const itemValue = isSwatch ? item.value : item.displayValue;
 
           return (
             <button
@@ -32,7 +32,7 @@ export default function AttributeSelector({ attribute, selected, onChange }) {
               style={isSwatch ? { backgroundColor: item.value } : {}}
               onClick={() => onChange(attribute.id, item.id)}
               title={item.displayValue}
-              data-testid={'product-attribute-' + attrKebab + '-' + itemKebab}
+              data-testid={'product-attribute-' + attrKebab + '-' + itemValue}
             >
               {isSwatch ? '' : item.displayValue}
             </button>
