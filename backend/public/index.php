@@ -7,12 +7,9 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 use App\Controller\GraphQL;
 use Dotenv\Dotenv;
 
-// On Render, environment variables are set directly in the dashboard
-$envPath = dirname(__DIR__);
-if (file_exists($envPath . '/.env')) {
-    $dotenv = Dotenv::createImmutable($envPath);
-    $dotenv->load();
-}
+// safeLoad() loads .env if it exists locally, silently skips if missing (Render)
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->safeLoad();
 
 header('Content-Type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Origin: *');
