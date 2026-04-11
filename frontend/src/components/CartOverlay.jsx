@@ -40,25 +40,25 @@ export default function CartOverlay() {
 
   return (
     <>
-      {/* Grey overlay behind content (not header)*/}
+    {/* Grey overlay behind content*/}
       <div
         className="cart-backdrop"
         onClick={() => setCartOpen(false)}
       />
 
       {/* Overlay panel*/}
-      <div className="cart-overlay">
+      <div className="cart-overlay" data-testid="cart-overlay">
         <p className="cart-overlay__title">
           <strong>My Bag</strong>, {itemLabel}
         </p>
-
+        
         {/* Product list */}
         <div className="cart-overlay__items">
           {cartItems.map(item => (
             <CartItem key={item.key} item={item} />
           ))}
         </div>
-
+        
         {/* Total */}
         <div className="cart-overlay__total">
           <span>Total</span>
@@ -66,10 +66,10 @@ export default function CartOverlay() {
             {formatPrice(totalPrice, symbol)}
           </span>
         </div>
-
+        
         {/* Place Order button */}
         <button
-          className={`cart-overlay__order-btn ${cartItems.length === 0 ? 'cart-overlay__order-btn--disabled' : ''}`}
+          className={'cart-overlay__order-btn' + (cartItems.length === 0 ? ' cart-overlay__order-btn--disabled' : '')}
           onClick={handlePlaceOrder}
           disabled={cartItems.length === 0}
         >

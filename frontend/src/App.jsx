@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { client } from './graphql/client';
 import { GET_CATEGORIES_AND_PRODUCTS } from './graphql/queries';
 import { CartProvider } from './context/CartContext';
@@ -9,27 +9,38 @@ import ProductListingPage from './pages/ProductListingPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import './App.css';
 
-function ShopApp() {
-  const [categories, setCategories]       = useState([]);
-  const [products, setProducts]           = useState([]);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [loading, setLoading]             = useState(true);
+// Wrapper so category route param sets active category
+function CategoryPage({ categories, onCategoryChange }) {
+  const { categoryName } = useParams();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading]   = useState(true);
 
-  // Fetch data whenever active category changes
   useEffect(() => {
+    if (categoryName) onCategoryChange(categoryName);
     setLoading(true);
     client
-      .request(GET_CATEGORIES_AND_PRODUCTS, { category: activeCategory })
+      .request(GET_CATEGORIES_AND_PRODUCTS, { category: categoryName || 'all' })
       .then(data => {
-        setCategories(data.categories);
         setProducts(data.products);
         setLoading(false);
       })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [activeCategory]);
+      .catch(() => setLoading(false));
+  }, [categoryName]);
+
+  if (loading) return <p className="loading">Loading...</p>;
+  return <ProductListingPage products={products} activeCategory={categoryName || 'all'} />;
+}
+
+function ShopApp() {
+  const [categories, setCategories]         = useState([]);
+  const [activeCategory, setActiveCategory] = useState('all');
+
+  useEffect(() => {
+    client
+      .request(GET_CATEGORIES_AND_PRODUCTS, { category: 'all' })
+      .then(data => setCategories(data.categories))
+      .catch(console.error);
+  }, []);
 
   return (
     <>
@@ -42,16 +53,18 @@ function ShopApp() {
 
       <div className="page-content">
         <Routes>
+          {/* Default route — show all products */}
           <Route
             path="/"
-            element={
-              loading
-                ? <p className="loading">Loading...</p>
-                : <ProductListingPage products={products} activeCategory={activeCategory} />
-            }
+            element={<CategoryPage categories={categories} onCategoryChange={setActiveCategory} />}
           />
+          {/* Category route — /all, /tech, /clothes */}
+          <Route
+            path="/:categoryName"
+            element={<CategoryPage categories={categories} onCategoryChange={setActiveCategory} />}
+          />
+          {/* Product details */}
           <Route path="/product/:id" element={<ProductDetailsPage />} />
-          {/* Catch-all -> home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
