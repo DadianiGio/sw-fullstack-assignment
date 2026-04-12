@@ -10,25 +10,26 @@ import ProductDetailsPage from './pages/ProductDetailsPage';
 import './App.css';
 
 // Wrapper so category route param sets active category
-function CategoryPage({ categories, onCategoryChange }) {
+function CategoryPage({ onCategoryChange }) {
   const { categoryName } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading]   = useState(true);
+  const activeCat = categoryName || 'all';
 
   useEffect(() => {
-    if (categoryName) onCategoryChange(categoryName);
+    onCategoryChange(activeCat);
     setLoading(true);
     client
-      .request(GET_CATEGORIES_AND_PRODUCTS, { category: categoryName || 'all' })
+      .request(GET_CATEGORIES_AND_PRODUCTS, { category: activeCat })
       .then(data => {
         setProducts(data.products);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [categoryName]);
+  }, [activeCat]);
 
   if (loading) return <p className="loading">Loading...</p>;
-  return <ProductListingPage products={products} activeCategory={categoryName || 'all'} />;
+  return <ProductListingPage products={products} activeCategory={activeCat} />;
 }
 
 function ShopApp() {
@@ -53,15 +54,15 @@ function ShopApp() {
 
       <div className="page-content">
         <Routes>
-          {/* Default route — show all products */}
+        {/* Default route — show all products */}
           <Route
             path="/"
-            element={<CategoryPage categories={categories} onCategoryChange={setActiveCategory} />}
+            element={<CategoryPage onCategoryChange={setActiveCategory} />}
           />
           {/* Category route — /all, /tech, /clothes */}
           <Route
             path="/:categoryName"
-            element={<CategoryPage categories={categories} onCategoryChange={setActiveCategory} />}
+            element={<CategoryPage onCategoryChange={setActiveCategory} />}
           />
           {/* Product details */}
           <Route path="/product/:id" element={<ProductDetailsPage />} />
