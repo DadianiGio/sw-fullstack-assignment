@@ -40,7 +40,7 @@ export default function Header({ categories = [], activeCategory, onCategoryChan
   const handleCategoryClick = (e, categoryName) => {
     e.preventDefault();
     onCategoryChange(categoryName);
-    navigate('/');
+    navigate('/' + categoryName);
   };
 
   return (
