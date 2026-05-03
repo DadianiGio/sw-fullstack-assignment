@@ -1,10 +1,25 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext(null);
 
+// Load cart from localStorage on startup
+const loadCart = () => {
+  try {
+    const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
+
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems]       = useState([]);
-  const [cartOpen, setCartOpen]         = useState(false);
+  const [cartItems, setCartItems] = useState(loadCart);
+  const [cartOpen, setCartOpen]   = useState(false);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   /**
    * Build a unique key for a cart item based on product id + selected options.
@@ -19,7 +34,7 @@ export function CartProvider({ children }) {
     setCartItems(prev => {
       const existing = prev.find(i => i.key === key);
       if (existing) {
-        // Same product + same options → increase quantity
+        // Same product + same options -> increase quantity
         return prev.map(i => i.key === key ? { ...i, quantity: i.quantity + 1 } : i);
       }
       // New line item
@@ -36,7 +51,7 @@ export function CartProvider({ children }) {
     setCartItems(prev =>
       prev
         .map(i => i.key === key ? { ...i, quantity: i.quantity - 1 } : i)
-        .filter(i => i.quantity > 0)   // remove if hits 0
+        .filter(i => i.quantity > 0)
     );
 
   const clearCart = () => setCartItems([]);
